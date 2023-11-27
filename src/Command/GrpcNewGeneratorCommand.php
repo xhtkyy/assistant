@@ -38,6 +38,12 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
             $phpOut = getcwd();
             $sourceDir = $phpOut . '/Grpc';
             $targetDir = $phpOut . '/grpc';
+            if(!file_exists($sourceDir)) {
+                mkdir($sourceDir);
+            }
+            if(!file_exists($targetDir)) {
+                mkdir($targetDir);
+            }
         }
 
         $grpcOut = $phpOut;
@@ -79,6 +85,7 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
                         }
                     }
                 }
+                rmdir($sourceDir);
             }
 
 
