@@ -78,9 +78,8 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
                         // 构建源文件和目标文件的完整路径
                         $sourceFile = $sourceDir . '/' . $file;
                         $targetFile = $targetDir . '/' . $file;
-
                         // 移动文件
-                        if (!rename($sourceFile, $targetFile)) {
+                        if (!is_dir($sourceFile) && !rename($sourceFile, $targetFile)) {
                             $this->output->writeln("Failed to move file: $file");
                         }
                     }
@@ -94,6 +93,10 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
             $this->output->writeln('');
             $this->output->writeln('<info>Successfully generate.</info>');
             return $return;
+        }
+
+        if (isset($sourceDir) && isset($targetDir)) {
+            rmdir($sourceDir);
         }
 
         $this->output->writeln('<error>protoc exited with an error (' . $return . ') when executed with: </error>');
