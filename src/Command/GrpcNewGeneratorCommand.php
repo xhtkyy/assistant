@@ -66,6 +66,10 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
         $result = $process->getOutput();
 
         if ($return === 0) {
+            //move
+            if (isset($sourceDir) && isset($targetDir)) {
+                $this->move($sourceDir, $targetDir);
+            }
             $this->output->writeln('');
             $this->output->writeln($result);
             $this->output->writeln('');
