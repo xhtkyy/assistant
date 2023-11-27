@@ -108,7 +108,7 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
                         $this->output->writeln("Failed to move file: $file");
                     }
                 }
-                unlink($sourceFile);
+                file_exists($sourceFile) && unlink($sourceFile);
             }
 
         }
