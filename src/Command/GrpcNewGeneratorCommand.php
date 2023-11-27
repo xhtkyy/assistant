@@ -38,12 +38,6 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
             $phpOut = getcwd();
             $sourceDir = $phpOut . '/Grpc';
             $targetDir = $phpOut . '/grpc';
-            if (!file_exists($sourceDir)) {
-                mkdir($sourceDir);
-            }
-            if (!file_exists($targetDir)) {
-                mkdir($targetDir);
-            }
         }
 
         $grpcOut = $phpOut;
@@ -102,6 +96,9 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
 
     private function move($sourceDir, $targetDir)
     {
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir);
+        }
         foreach (scandir($sourceDir) as $file) {
             // 忽略目录中的 '.' 和 '..' 文件
             if ($file != '.' && $file != '..') {
