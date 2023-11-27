@@ -38,10 +38,10 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
             $phpOut = getcwd();
             $sourceDir = $phpOut . '/Grpc';
             $targetDir = $phpOut . '/grpc';
-            if(!file_exists($sourceDir)) {
+            if (!file_exists($sourceDir)) {
                 mkdir($sourceDir);
             }
-            if(!file_exists($targetDir)) {
+            if (!file_exists($targetDir)) {
                 mkdir($targetDir);
             }
         }
@@ -72,18 +72,7 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
 
             //move
             if (isset($sourceDir) && isset($targetDir)) {
-                foreach (scandir($sourceDir) as $file) {
-                    // 忽略目录中的 '.' 和 '..' 文件
-                    if ($file != '.' && $file != '..') {
-                        // 构建源文件和目标文件的完整路径
-                        $sourceFile = $sourceDir . '/' . $file;
-                        $targetFile = $targetDir . '/' . $file;
-                        // 移动文件
-                        if (!is_dir($sourceFile) && !rename($sourceFile, $targetFile)) {
-                            $this->output->writeln("Failed to move file: $file");
-                        }
-                    }
-                }
+                $this->move($sourceDir, $targetDir);
                 rmdir($sourceDir);
             }
 
@@ -109,6 +98,26 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
         $this->output->writeln('');
 
         return $return;
+    }
+
+    private function move($sourceDir, $targetDir)
+    {
+        foreach (scandir($sourceDir) as $file) {
+            // 忽略目录中的 '.' 和 '..' 文件
+            if ($file != '.' && $file != '..') {
+                // 构建源文件和目标文件的完整路径
+                $sourceFile = $sourceDir . '/' . $file;
+                $targetFile = $targetDir . '/' . $file;
+                if (is_dir($sourceFile)) {
+                    $this->move($sourceFile, $targetFile);
+                } else {
+                    // 移动文件
+                    if (!rename($sourceFile, $targetFile)) {
+                        $this->output->writeln("Failed to move file: $file");
+                    }
+                }
+            }
+        }
     }
 
     private function getRootPath(string $path): string
