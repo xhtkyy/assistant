@@ -38,6 +38,9 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
             $phpOut = getcwd();
             $sourceDir = $phpOut . '/Grpc';
             $targetDir = $phpOut . '/grpc';
+            if (!file_exists($targetDir)) {
+                mkdir($targetDir);
+            }
         }
 
         $grpcOut = $phpOut;
@@ -63,23 +66,11 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
         $result = $process->getOutput();
 
         if ($return === 0) {
-
-            //move
-            if (isset($sourceDir) && isset($targetDir)) {
-                $this->move($sourceDir, $targetDir);
-                rmdir($sourceDir);
-            }
-
-
             $this->output->writeln('');
             $this->output->writeln($result);
             $this->output->writeln('');
             $this->output->writeln('<info>Successfully generate.</info>');
             return $return;
-        }
-
-        if (isset($sourceDir) && isset($targetDir)) {
-            rmdir($sourceDir);
         }
 
         $this->output->writeln('<error>protoc exited with an error (' . $return . ') when executed with: </error>');
@@ -114,7 +105,9 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
                     }
                 }
             }
+            unlink($file);
         }
+        rmdir($sourceDir);
     }
 
     private function getRootPath(string $path): string
