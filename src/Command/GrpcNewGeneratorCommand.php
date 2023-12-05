@@ -38,9 +38,6 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
             $phpOut = getcwd();
             $sourceDir = $phpOut . '/Grpc';
             $targetDir = $phpOut . '/grpc';
-            if (!file_exists($targetDir)) {
-                mkdir($targetDir);
-            }
         }
 
         $grpcOut = $phpOut;
@@ -68,7 +65,7 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
         if ($return === 0) {
             //move
             if (isset($sourceDir) && isset($targetDir)) {
-                $this->move($sourceDir, $targetDir);
+                $this->move($sourceDir, $targetDir, true);
             }
             $this->output->writeln('');
             $this->output->writeln($result);
@@ -89,11 +86,12 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
         return $return;
     }
 
-    private function move($sourceDir, $targetDir)
+    private function move($sourceDir, $targetDir, $isDir = false)
     {
-        if (!file_exists($targetDir)) {
+        if (!file_exists($targetDir) && $isDir) {
             mkdir($targetDir);
         }
+
         foreach (scandir($sourceDir) as $file) {
             // 忽略目录中的 '.' 和 '..' 文件
             if ($file != '.' && $file != '..') {
@@ -101,17 +99,23 @@ class GrpcNewGeneratorCommand extends \Hyperf\Command\Command
                 $sourceFile = $sourceDir . '/' . $file;
                 $targetFile = $targetDir . '/' . $file;
                 if (is_dir($sourceFile)) {
-                    $this->move($sourceFile, $targetFile);
+                    $this->move($sourceFile, $targetFile, true);
                 } else {
                     // 移动文件
+                    if (file_exists($targetFile)) {
+                        unlink($targetFile);
+                    }
                     if (!rename($sourceFile, $targetFile)) {
                         $this->output->writeln("Failed to move file: $file");
                     }
                 }
-                file_exists($sourceFile) && unlink($sourceFile);
+                if (file_exists($sourceFile)) {
+                    unlink($sourceFile);
+                }
             }
 
         }
+
         rmdir($sourceDir);
     }
 
